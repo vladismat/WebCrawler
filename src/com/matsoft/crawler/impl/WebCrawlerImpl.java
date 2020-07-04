@@ -7,20 +7,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 public class WebCrawlerImpl implements WebCrawler {
     private String url;
     private List<String> foundURLs;
     private List<String> terms;
+    private BlockingQueue<String> urlsToVisit;
+    private Set<String> visitedURLs;
 
-    public WebCrawlerImpl(String url, final List<String> terms) {
+    public WebCrawlerImpl(String url, final List<String> terms, BlockingQueue<String> urlsToVisit, final Set<String> visitedURLs) {
         this.url = url;
         this.foundURLs = new ArrayList<>();
         this.terms = terms;
+        this.urlsToVisit = urlsToVisit;
+        this.visitedURLs = visitedURLs;
     }
 
     public void run() {
@@ -29,17 +31,20 @@ public class WebCrawlerImpl implements WebCrawler {
         }
     }
 
-    public List<String> getFoundURLs () {
-        return this.foundURLs;
-    }
-
     private void processPage(String url) {
         Document document;
         try {
             document = Jsoup.connect(url).get();
             searchForLinks(document);
+            for (String newUrl: foundURLs) {
+                urlsToVisit.offer(newUrl);
+            }
             Element body = document.body();
             Map<String, Integer> searchResult = searchForTerms(body, terms);
+            System.out.println("On page " + url + "were found: ");
+            for (String term : terms) {
+                System.out.println(term + " " + searchResult.get(term));
+            }
         } catch (IOException e) {
             //TODO: implement exception handler
         }
@@ -48,7 +53,9 @@ public class WebCrawlerImpl implements WebCrawler {
     private void searchForLinks(Document document) {
         Elements links = document.select("a[href]");
         for (Element link : links) {
-            foundURLs.add(link.attr("abs:href"));
+            String url = link.attr("abs:href");
+            if (!visitedURLs.contains(url))
+                foundURLs.add(url);
         }
     }
 
@@ -64,7 +71,7 @@ public class WebCrawlerImpl implements WebCrawler {
     private Integer countSubstringOccurences(String term, String source) {
         Integer count = 0;
         int fromIndex = 0;
-        while ((fromIndex = source.indexOf(term, fromIndex)) != -1 ){
+        while ((fromIndex = source.indexOf(term, fromIndex)) != -1) {
             count++;
             fromIndex++;
         }
