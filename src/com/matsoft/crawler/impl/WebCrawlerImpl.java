@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -16,13 +17,16 @@ public class WebCrawlerImpl implements WebCrawler {
     private List<String> terms;
     private BlockingQueue<String> urlsToVisit;
     private Set<String> visitedURLs;
+    private FileWriter fileWriter;
 
-    public WebCrawlerImpl(String url, final List<String> terms, BlockingQueue<String> urlsToVisit, final Set<String> visitedURLs) {
+    public WebCrawlerImpl(String url, final List<String> terms, BlockingQueue<String> urlsToVisit,
+                          final Set<String> visitedURLs, FileWriter fileWriter) {
         this.url = url;
         this.foundURLs = new ArrayList<>();
         this.terms = terms;
         this.urlsToVisit = urlsToVisit;
         this.visitedURLs = visitedURLs;
+        this.fileWriter = fileWriter;
     }
 
     public void run() {
@@ -36,19 +40,20 @@ public class WebCrawlerImpl implements WebCrawler {
         try {
             document = Jsoup.connect(url).get();
             searchForLinks(document);
-            for (String newUrl: foundURLs) {
+            for (String newUrl : foundURLs) {
                 urlsToVisit.offer(newUrl);
             }
             Element body = document.body();
             Map<String, Integer> searchResult = searchForTerms(body, terms);
-            System.out.println("On page " + url + "were found: ");
+            printToFile("On page " + url + " were found: \n");
             for (String term : terms) {
-                System.out.println(term + " " + searchResult.get(term));
+                printToFile(term + " " + searchResult.get(term)+"\n");
             }
-        } catch (IllegalArgumentException e){
+            visitedURLs.add(url);
+        } catch (IllegalArgumentException e) {
             System.out.println(url + " is not valid");
         } catch (IOException e) {
-            System.out.println("Oh no, couldn't get page from "+ url );
+            System.out.println("Oh no, couldn't get page from " + url);
         }
     }
 
@@ -56,7 +61,7 @@ public class WebCrawlerImpl implements WebCrawler {
         Elements links = document.select("a[href]");
         for (Element link : links) {
             String url = link.attr("abs:href");
-            if (visitedURLs.add(url))
+            if (!visitedURLs.contains(url))
                 foundURLs.add(url);
         }
     }
@@ -78,5 +83,13 @@ public class WebCrawlerImpl implements WebCrawler {
             fromIndex++;
         }
         return count;
+    }
+
+    private void printToFile(String s) {
+        try {
+            fileWriter.write(s);
+        } catch (IOException e) {
+            System.out.println("Couldn't write the result" + e.getMessage());
+        }
     }
 }
