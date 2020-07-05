@@ -21,6 +21,7 @@ public class CrawlerController {
         this.seed = seed;
         this.terms = terms;
         this.urlsToVisit = new ArrayBlockingQueue<>(1000);
+        this.visitedURLs = new HashSet<>();
     }
 
     public void start() {
@@ -29,11 +30,15 @@ public class CrawlerController {
             Thread seedCrawler = new Thread(new WebCrawlerImpl(seed, terms, urlsToVisit, visitedURLs));
             seedCrawler.start();
             seedCrawler.join();
-            while (visitedURLs.size() < LIMIT) {
+            int counter = 0;
+            while (visitedURLs.size() < LIMIT && counter < 10000) {
                 String url = urlsToVisit.take();
                 Thread crawler = new Thread(new WebCrawlerImpl(url, terms, urlsToVisit, visitedURLs));
                 crawler.start();
+                System.out.println("active threads: " + Thread.getAllStackTraces().keySet().size());
+                counter++;
             }
+            System.out.println(Thread.getAllStackTraces().keySet().size());
         } catch (InterruptedException e) {
             //TODO: implement exception handler
         }

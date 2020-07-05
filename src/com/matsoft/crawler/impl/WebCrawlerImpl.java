@@ -45,8 +45,10 @@ public class WebCrawlerImpl implements WebCrawler {
             for (String term : terms) {
                 System.out.println(term + " " + searchResult.get(term));
             }
+        } catch (IllegalArgumentException e){
+            System.out.println(url + " is not valid");
         } catch (IOException e) {
-            //TODO: implement exception handler
+            System.out.println("Oh no, couldn't get page from "+ url );
         }
     }
 
@@ -54,7 +56,7 @@ public class WebCrawlerImpl implements WebCrawler {
         Elements links = document.select("a[href]");
         for (Element link : links) {
             String url = link.attr("abs:href");
-            if (!visitedURLs.contains(url))
+            if (visitedURLs.add(url))
                 foundURLs.add(url);
         }
     }
