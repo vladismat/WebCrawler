@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CrawlerController {
     private static final int LIMIT = 1000;
@@ -17,6 +19,7 @@ public class CrawlerController {
     private Set<String> visitedURLs;
     private BlockingQueue<String> urlsToVisit;
     private FileWriter fileWriter = null;
+    static private Logger LOGGER = Logger.getLogger(CrawlerController.class.getName());
 
     public CrawlerController(String seed, List<String> terms) {
         this.seed = seed;
@@ -26,7 +29,7 @@ public class CrawlerController {
         try {
             this.fileWriter = new FileWriter("output.txt");
         } catch (IOException e) {
-
+            LOGGER.log(Level.SEVERE, "File Writer couldn't create a file", e);
         }
     }
 
@@ -44,7 +47,6 @@ public class CrawlerController {
                 counter++;
             }
             executor.shutdown();
-            System.out.println(Thread.getAllStackTraces().keySet().size());
             try {
                 for (; ; ) {
                     if (executor.isTerminated()) {
@@ -53,9 +55,10 @@ public class CrawlerController {
                     }
                 }
             } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "File Writer couldn't close", e);
             }
         } catch (InterruptedException e) {
-            //TODO: implement exception handler
+            LOGGER.log(Level.SEVERE, "The thread were somehow interrupted", e);
         }
     }
 }

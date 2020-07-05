@@ -9,10 +9,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class Main {
 
+    static private Logger LOGGER = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
+        try {
+            LogManager.getLogManager().readConfiguration(
+                    Main.class.getResourceAsStream("/logging.properties"));
+        } catch (IOException e) {
+            System.err.println("Could not setup logger configuration: " + e.toString());
+        }
         String seed = "";
         List<String> terms = new ArrayList<>();
         try {
@@ -22,7 +33,7 @@ public class Main {
                 terms.add(scanner.nextLine());
             }
         } catch (FileNotFoundException e) {
-            System.out.println("File wasn't found");
+            LOGGER.log(Level.SEVERE, "Input file wasn't found", e);
         }
         CrawlerController crawlerController = new CrawlerController(seed, terms);
         crawlerController.start();

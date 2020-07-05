@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WebCrawlerImpl implements WebCrawler {
     private String url;
@@ -18,6 +20,7 @@ public class WebCrawlerImpl implements WebCrawler {
     private BlockingQueue<String> urlsToVisit;
     private Set<String> visitedURLs;
     private FileWriter fileWriter;
+    static private Logger LOGGER = Logger.getLogger(WebCrawlerImpl.class.getName());
 
     public WebCrawlerImpl(String url, final List<String> terms, BlockingQueue<String> urlsToVisit,
                           final Set<String> visitedURLs, FileWriter fileWriter) {
@@ -47,13 +50,13 @@ public class WebCrawlerImpl implements WebCrawler {
             Map<String, Integer> searchResult = searchForTerms(body, terms);
             printToFile("On page " + url + " were found: \n");
             for (String term : terms) {
-                printToFile(term + " " + searchResult.get(term)+"\n");
+                printToFile(term + " " + searchResult.get(term) + "\n");
             }
             visitedURLs.add(url);
         } catch (IllegalArgumentException e) {
-            System.out.println(url + " is not valid");
+            LOGGER.log(Level.WARNING, "url " + url + " is not valid", e);
         } catch (IOException e) {
-            System.out.println("Oh no, couldn't get page from " + url);
+            LOGGER.log(Level.WARNING, "Couldn't get page from " + url);
         }
     }
 
@@ -89,7 +92,7 @@ public class WebCrawlerImpl implements WebCrawler {
         try {
             fileWriter.write(s);
         } catch (IOException e) {
-            System.out.println("Couldn't write the result" + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Couldn't write the result", e);
         }
     }
 }
