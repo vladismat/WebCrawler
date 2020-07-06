@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CrawlerController {
-    private static final int LIMIT = 2000;
+    private static final int LIMIT = 100;
     private String seed;
     private List<String> terms;
     private Set<String> visitedURLs;
@@ -51,6 +51,10 @@ public class CrawlerController {
                 if (url != null) {
                     executor.execute(new WebCrawlerImpl(url, terms, urlsToVisit, visitedURLs, fileWriter));
                     visitedURLs.add(url.getUrl());
+                } else {
+                    Thread.sleep(1000);
+                    if(urlsToVisit.isEmpty())
+                        break;
                 }
             }
             executor.shutdown();
