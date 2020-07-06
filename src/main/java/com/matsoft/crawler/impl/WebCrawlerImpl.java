@@ -39,6 +39,22 @@ public class WebCrawlerImpl implements WebCrawler {
         }
     }
 
+    public WebURL getUrl() {
+        return url;
+    }
+
+    public List<String> getTerms() {
+        return terms;
+    }
+
+    public BlockingQueue<WebURL> getUrlsToVisit() {
+        return urlsToVisit;
+    }
+
+    public Set<String> getVisitedURLs() {
+        return visitedURLs;
+    }
+
     private void processPage(WebURL url) {
         Document document;
         try {
@@ -72,8 +88,9 @@ public class WebCrawlerImpl implements WebCrawler {
         Elements links = document.select("a[href]");
         for (Element link : links) {
             String url = link.attr("abs:href");
-            if (!visitedURLs.contains(url))
+            if (!visitedURLs.contains(url)) {
                 foundURLs.add(url);
+            }
         }
         return foundURLs;
     }
@@ -82,12 +99,12 @@ public class WebCrawlerImpl implements WebCrawler {
         Map<String, Integer> result = new HashMap<>();
         String bodyText = body.text();
         for (String t : terms) {
-            result.put(t, countSubstringOccurences(t, bodyText));
+            result.put(t, countSubstringOccurrences(t, bodyText));
         }
         return result;
     }
 
-    private Integer countSubstringOccurences(String term, String source) {
+    private Integer countSubstringOccurrences(String term, String source) {
         Integer count = 0;
         int fromIndex = 0;
         while ((fromIndex = source.indexOf(term, fromIndex)) != -1) {
