@@ -50,7 +50,7 @@ public class WebCrawlerImpl implements WebCrawler {
             }
             Element body = document.body();
             Map<String, Integer> searchResult = searchForTerms(body, terms);
-            printToFile("On page " + url + " were found: \n");
+            printToFile("On page " + url.getUrl() + ", that had depth of the search  " + url.getDepth() + ", were found: \n");
             int totalHits = 0;
             for (String term : terms) {
                 printToFile(term + " " + searchResult.get(term) + "\n");
