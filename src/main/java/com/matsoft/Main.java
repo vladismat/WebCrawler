@@ -17,6 +17,7 @@ public class Main {
     private static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
+        long begin = System.currentTimeMillis();
         try {
             LogManager.getLogManager().readConfiguration(
                     Main.class.getResourceAsStream("/logging.properties"));
@@ -36,5 +37,8 @@ public class Main {
         }
         CrawlerController crawlerController = new CrawlerController(seed, terms);
         crawlerController.start();
+        long end = System.currentTimeMillis();
+        long time = (end - begin) / 1000;
+        System.out.println("It took " + time + " seconds");
     }
 }
