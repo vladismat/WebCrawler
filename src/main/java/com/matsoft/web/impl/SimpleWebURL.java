@@ -16,6 +16,9 @@ public class SimpleWebURL implements WebURL {
         if (!isValidURL(url)) {
             throw new UrlNotValidException(url);
         }
+        if (depth < 0) {
+            throw new IllegalArgumentException("Depth cannot be negative");
+        }
         this.url = url;
         this.depth = depth;
     }
