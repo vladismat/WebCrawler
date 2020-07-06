@@ -1,6 +1,8 @@
 package com.matsoft.crawler;
 
 import com.matsoft.crawler.impl.WebCrawlerImpl;
+import com.matsoft.web.WebURL;
+import com.matsoft.web.impl.WebURLimpl;
 
 
 import java.io.FileWriter;
@@ -17,7 +19,8 @@ public class CrawlerController {
     private String seed;
     private List<String> terms;
     private Set<String> visitedURLs;
-    private BlockingQueue<String> urlsToVisit;
+    private BlockingQueue<WebURL> urlsToVisit;
+
     private FileWriter fileWriter = null;
     static private Logger LOGGER = Logger.getLogger(CrawlerController.class.getName());
 
@@ -37,13 +40,15 @@ public class CrawlerController {
         try {
             ExecutorService executor = Executors.newFixedThreadPool(5);
             visitedURLs.add(seed);
-            Thread seedCrawler = new Thread(new WebCrawlerImpl(seed, terms, urlsToVisit, visitedURLs, fileWriter));
+            Thread seedCrawler = new Thread(new WebCrawlerImpl(new WebURLimpl(seed, 1), terms, urlsToVisit, visitedURLs, fileWriter));
             seedCrawler.start();
             seedCrawler.join();
             int counter = 0;
             while (visitedURLs.size() < LIMIT && counter < 1000) {
-                String url = urlsToVisit.take();
-                executor.execute(new WebCrawlerImpl(url, terms, urlsToVisit, visitedURLs, fileWriter));
+                WebURL url = urlsToVisit.poll();
+                if (url != null) {
+                    executor.execute(new WebCrawlerImpl(url, terms, urlsToVisit, visitedURLs, fileWriter));
+                }
                 counter++;
             }
             executor.shutdown();
@@ -62,4 +67,3 @@ public class CrawlerController {
         }
     }
 }
-

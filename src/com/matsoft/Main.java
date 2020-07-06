@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             LogManager.getLogManager().readConfiguration(
-                    Main.class.getResourceAsStream("/logging.properties"));
+                    Main.class.getResourceAsStream("/com/matsoft/logging.properties"));
         } catch (IOException e) {
             System.err.println("Could not setup logger configuration: " + e.toString());
         }

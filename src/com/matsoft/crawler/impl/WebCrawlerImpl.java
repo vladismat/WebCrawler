@@ -1,6 +1,8 @@
 package com.matsoft.crawler.impl;
 
 import com.matsoft.crawler.WebCrawler;
+import com.matsoft.web.WebURL;
+import com.matsoft.web.impl.WebURLimpl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,15 +16,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class WebCrawlerImpl implements WebCrawler {
-    private String url;
+    private WebURL url;
     private List<String> foundURLs;
     private List<String> terms;
-    private BlockingQueue<String> urlsToVisit;
+    private BlockingQueue<WebURL> urlsToVisit;
     private Set<String> visitedURLs;
     private FileWriter fileWriter;
     static private Logger LOGGER = Logger.getLogger(WebCrawlerImpl.class.getName());
 
-    public WebCrawlerImpl(String url, final List<String> terms, BlockingQueue<String> urlsToVisit,
+    public WebCrawlerImpl(WebURL url, final List<String> terms, BlockingQueue<WebURL> urlsToVisit,
                           final Set<String> visitedURLs, FileWriter fileWriter) {
         this.url = url;
         this.foundURLs = new ArrayList<>();
@@ -33,26 +35,29 @@ public class WebCrawlerImpl implements WebCrawler {
     }
 
     public void run() {
-        if (url != null) {
+        if (url != null && !url.getUrl().equals("") && url.getDepth() < 8) {
             processPage(url);
         }
     }
 
-    private void processPage(String url) {
+    private void processPage(WebURL url) {
         Document document;
         try {
-            document = Jsoup.connect(url).get();
+            document = Jsoup.connect(url.getUrl()).get();
             searchForLinks(document);
             for (String newUrl : foundURLs) {
-                urlsToVisit.offer(newUrl);
+                urlsToVisit.offer(new WebURLimpl(newUrl, url.getDepth() + 1));
             }
             Element body = document.body();
             Map<String, Integer> searchResult = searchForTerms(body, terms);
             printToFile("On page " + url + " were found: \n");
+            int totalHits = 0;
             for (String term : terms) {
                 printToFile(term + " " + searchResult.get(term) + "\n");
+                totalHits += searchResult.get(term);
             }
-            visitedURLs.add(url);
+            printToFile("Total hits on page: " + totalHits + "\n \n");
+            visitedURLs.add(url.getUrl());
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "url " + url + " is not valid", e);
         } catch (IOException e) {
@@ -70,7 +75,7 @@ public class WebCrawlerImpl implements WebCrawler {
     }
 
     private Map<String, Integer> searchForTerms(Element body, List<String> terms) {
-        HashMap<String, Integer> result = new HashMap<>();
+        Map<String, Integer> result = new HashMap<>();
         String bodyText = body.text();
         for (String t : terms) {
             result.put(t, countSubstringOccurences(t, bodyText));
