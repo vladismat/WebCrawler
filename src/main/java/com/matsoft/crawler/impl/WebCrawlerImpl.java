@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 
 public class WebCrawlerImpl implements WebCrawler {
     private WebURL url;
-    private List<String> foundURLs;
     private List<String> terms;
     private BlockingQueue<WebURL> urlsToVisit;
     private Set<String> visitedURLs;
@@ -28,7 +27,6 @@ public class WebCrawlerImpl implements WebCrawler {
     public WebCrawlerImpl(WebURL url, final List<String> terms, BlockingQueue<WebURL> urlsToVisit,
                           final Set<String> visitedURLs, FileWriter fileWriter) {
         this.url = url;
-        this.foundURLs = new ArrayList<>();
         this.terms = terms;
         this.urlsToVisit = urlsToVisit;
         this.visitedURLs = visitedURLs;
@@ -45,9 +43,8 @@ public class WebCrawlerImpl implements WebCrawler {
         Document document;
         try {
             document = Jsoup.connect(url.getUrl()).get();
-            searchForLinks(document);
+            List<String> foundURLs = searchForLinks(document);
             for (String newUrl : foundURLs) {
-                WebURL offeringURL;
                 try {
                     urlsToVisit.offer(new SimpleWebURL(newUrl, url.getDepth() + 1));
                 } catch (UrlNotValidException e) {
@@ -63,7 +60,6 @@ public class WebCrawlerImpl implements WebCrawler {
                 totalHits += searchResult.get(term);
             }
             printToFile("Total hits on page: " + totalHits + "\n \n");
-            visitedURLs.add(url.getUrl());
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "url " + url + " is not valid", e);
         } catch (IOException e) {
@@ -71,13 +67,15 @@ public class WebCrawlerImpl implements WebCrawler {
         }
     }
 
-    private void searchForLinks(Document document) {
+    private List<String> searchForLinks(Document document) {
+        List<String> foundURLs = new ArrayList<>();
         Elements links = document.select("a[href]");
         for (Element link : links) {
             String url = link.attr("abs:href");
             if (!visitedURLs.contains(url))
                 foundURLs.add(url);
         }
+        return foundURLs;
     }
 
     private Map<String, Integer> searchForTerms(Element body, List<String> terms) {

@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CrawlerController {
-    private static final int LIMIT = 1000;
+    private static final int LIMIT = 2000;
     private String seed;
     private List<String> terms;
     private Set<String> visitedURLs;
@@ -46,13 +46,12 @@ public class CrawlerController {
             Thread seedCrawler = new Thread(new WebCrawlerImpl(seedURL, terms, urlsToVisit, visitedURLs, fileWriter));
             seedCrawler.start();
             seedCrawler.join();
-            int counter = 0;
-            while (visitedURLs.size() < LIMIT && counter < 1000) {
+            while (visitedURLs.size() < LIMIT) {
                 WebURL url = urlsToVisit.poll();
                 if (url != null) {
                     executor.execute(new WebCrawlerImpl(url, terms, urlsToVisit, visitedURLs, fileWriter));
+                    visitedURLs.add(url.getUrl());
                 }
-                counter++;
             }
             executor.shutdown();
             try {
