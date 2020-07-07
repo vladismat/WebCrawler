@@ -96,6 +96,9 @@ public class WebCrawlerImpl implements WebCrawler {
                 }
             }
             Element body = document.body();
+            if (body == null)
+                return;
+
             Map<String, Integer> searchResult = searchForTerms(body, terms);
             printToFile("On page " + url.getUrl() + ", that had depth of the search  " + url.getDepth() + ", were found: \n");
             int totalHits = 0;

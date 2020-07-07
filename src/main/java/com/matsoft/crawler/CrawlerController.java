@@ -1,6 +1,7 @@
 package com.matsoft.crawler;
 
 import com.matsoft.crawler.impl.WebCrawlerImpl;
+import com.matsoft.exception.UrlNotValidException;
 import com.matsoft.web.WebURL;
 import com.matsoft.web.impl.SimpleWebURL;
 
@@ -18,7 +19,6 @@ import java.util.logging.Logger;
 
 /**
  * CrawlerController class initiates the process of crawling, sends crawlers to different websites and manages multithreading.
- *
  */
 public class CrawlerController {
     private static final int LIMIT = 1000; //Maximum number of pages to crawl. 1000 by default.
@@ -33,7 +33,7 @@ public class CrawlerController {
     /**
      * Constructor. Initiates collections and File Writer. It's impossible to start crawling without a seed and a list of terms.
      *
-     * @param seed seed URL to start crawling
+     * @param seed  seed URL to start crawling
      * @param terms a list of terms to search for
      */
     public CrawlerController(String seed, List<String> terms) {
@@ -55,10 +55,17 @@ public class CrawlerController {
         try {
             ExecutorService executor = Executors.newFixedThreadPool(5);
             visitedURLs.add(seed);
-            WebURL seedURL = new SimpleWebURL(seed, 1);
-            Thread seedCrawler = new Thread(new WebCrawlerImpl(seedURL, terms, urlsToVisit, visitedURLs, fileWriter));
-            seedCrawler.start();
-            seedCrawler.join();
+
+            //Seed processing
+            try {
+                WebURL seedURL = new SimpleWebURL(seed, 1);
+                Thread seedCrawler = new Thread(new WebCrawlerImpl(seedURL, terms, urlsToVisit, visitedURLs, fileWriter));
+                seedCrawler.start();
+                seedCrawler.join();
+            } catch (UrlNotValidException e) {
+                System.out.println("Seed URL " + seed + " is not valid. Please, change the input");
+            }
+
             while (visitedURLs.size() < LIMIT) {
                 WebURL url = urlsToVisit.poll();
                 if (url != null) {

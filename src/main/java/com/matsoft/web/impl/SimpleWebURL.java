@@ -17,7 +17,7 @@ public class SimpleWebURL implements WebURL {
     /**
      * The only constructor with two arguments
      *
-     * @param url string value of URL
+     * @param url string value of URL that is http or https protocol (ftp is not allowed!)
      * @param depth depth to assign for the object
      * @throws UrlNotValidException on invalid URL passed
      * @see UrlNotValidException
