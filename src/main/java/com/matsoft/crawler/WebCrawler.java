@@ -2,6 +2,7 @@ package com.matsoft.crawler;
 
 import com.matsoft.web.WebURL;
 
+import java.io.FileWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -15,5 +16,7 @@ public interface WebCrawler extends Runnable {
     BlockingQueue<WebURL> getUrlsToVisit();
 
     Set<String> getVisitedURLs();
+
+    FileWriter getFileWriter();
 
 }

@@ -33,26 +33,36 @@ public class WebCrawlerImpl implements WebCrawler {
         this.fileWriter = fileWriter;
     }
 
+    @Override
     public void run() {
         if (url != null && !url.getUrl().equals("") && url.getDepth() < 8) {
             processPage(url);
         }
     }
 
+    @Override
     public WebURL getUrl() {
         return url;
     }
 
+    @Override
     public List<String> getTerms() {
         return terms;
     }
 
+    @Override
     public BlockingQueue<WebURL> getUrlsToVisit() {
         return urlsToVisit;
     }
 
+    @Override
     public Set<String> getVisitedURLs() {
         return visitedURLs;
+    }
+
+    @Override
+    public FileWriter getFileWriter() {
+        return fileWriter;
     }
 
     private void processPage(WebURL url) {
@@ -76,6 +86,7 @@ public class WebCrawlerImpl implements WebCrawler {
                 totalHits += searchResult.get(term);
             }
             printToFile("Total hits on page: " + totalHits + "\n \n");
+
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "url " + url + " is not valid", e);
         } catch (IOException e) {

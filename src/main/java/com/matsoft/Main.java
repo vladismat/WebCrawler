@@ -32,9 +32,11 @@ public class Main {
             while (scanner.hasNext()) {
                 terms.add(scanner.nextLine());
             }
+            scanner.close();
         } catch (FileNotFoundException e) {
             LOGGER.log(Level.SEVERE, "Input file wasn't found", e);
         }
+
         CrawlerController crawlerController = new CrawlerController(seed, terms);
         crawlerController.start();
         long end = System.currentTimeMillis();
