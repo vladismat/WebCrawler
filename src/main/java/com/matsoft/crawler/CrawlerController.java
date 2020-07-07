@@ -58,7 +58,7 @@ public class CrawlerController {
 
             //Seed processing
             try {
-                WebURL seedURL = new SimpleWebURL(seed, 1);
+                WebURL seedURL = new SimpleWebURL(seed, 0);
                 Thread seedCrawler = new Thread(new WebCrawlerImpl(seedURL, terms, urlsToVisit, visitedURLs, fileWriter));
                 seedCrawler.start();
                 seedCrawler.join();
