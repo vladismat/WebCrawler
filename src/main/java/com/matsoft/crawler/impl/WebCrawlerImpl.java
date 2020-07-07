@@ -111,7 +111,7 @@ public class WebCrawlerImpl implements WebCrawler {
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "url " + url + " is not valid", e);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Couldn't get page from " + url);
+            LOGGER.log(Level.WARNING, "Couldn't get page from " + url.getUrl());
         }
     }
 
