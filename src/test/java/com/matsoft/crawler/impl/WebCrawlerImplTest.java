@@ -42,7 +42,7 @@ public class WebCrawlerImplTest {
         webCrawler.run();
         webCrawler.getFileWriter().close();
         Scanner scanner = new Scanner(new File("test_output.txt"));
-        assertEquals("On page "+TEST_URL+", that had depth of the search  2, were found: ", scanner.nextLine());
+        assertEquals("On page " + TEST_URL + ", that had depth of the search  2, were found: ", scanner.nextLine());
         assertEquals("Septimius Severus 57", scanner.nextLine());
         assertEquals("Rome 28", scanner.nextLine());
         assertEquals("the 426", scanner.nextLine());

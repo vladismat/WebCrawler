@@ -16,6 +16,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * An implementation of WebCrawler.
+ */
 public class WebCrawlerImpl implements WebCrawler {
     private WebURL url;
     private List<String> terms;
@@ -24,6 +27,15 @@ public class WebCrawlerImpl implements WebCrawler {
     private FileWriter fileWriter;
     static private Logger LOGGER = Logger.getLogger(WebCrawlerImpl.class.getName());
 
+    /**
+     * Constructor of the WebCrawler.
+     *
+     * @param url URL of the page to process. WebURL interface to know the depth.
+     * @param terms list of terms to search
+     * @param urlsToVisit Blocking Queue of URLs passed by the controller to put found links in
+     * @param visitedURLs Set of already visited urls to check found URLs
+     * @param fileWriter File Writer for output to file
+     */
     public WebCrawlerImpl(WebURL url, final List<String> terms, BlockingQueue<WebURL> urlsToVisit,
                           final Set<String> visitedURLs, FileWriter fileWriter) {
         this.url = url;
@@ -33,9 +45,15 @@ public class WebCrawlerImpl implements WebCrawler {
         this.fileWriter = fileWriter;
     }
 
+    /**
+     * Processes a single page set by the constructor if the url isn't too deep.
+     * To process a web page the method uses JSOUP library methods.
+     *
+     * @see org.jsoup
+     */
     @Override
     public void run() {
-        if (url != null && !url.getUrl().equals("") && url.getDepth() < 8) {
+        if (url != null && url.getDepth() < 8) {
             processPage(url);
         }
     }

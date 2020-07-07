@@ -1,10 +1,11 @@
 package com.matsoft.exception;
 
-import com.matsoft.web.WebURL;
 
+/**
+ * Custom exception class that is thrown in case that found URL isn't valid.
+ */
 public class UrlNotValidException extends RuntimeException {
 
-    private WebURL notValidURL;
     private static final String DEFAULT_MESSAGE = "URL is not valid";
 
     public UrlNotValidException() {

@@ -16,8 +16,12 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * CrawlerController class initiates the process of crawling, sends crawlers to different websites and manages multithreading.
+ *
+ */
 public class CrawlerController {
-    private static final int LIMIT = 100;
+    private static final int LIMIT = 1000; //Maximum number of pages to crawl. 1000 by default.
     private String seed;
     private List<String> terms;
     private Set<String> visitedURLs;
@@ -26,6 +30,12 @@ public class CrawlerController {
     private FileWriter fileWriter = null;
     static private Logger LOGGER = Logger.getLogger(CrawlerController.class.getName());
 
+    /**
+     * Constructor. Initiates collections and File Writer. It's impossible to start crawling without a seed and a list of terms.
+     *
+     * @param seed seed URL to start crawling
+     * @param terms a list of terms to search for
+     */
     public CrawlerController(String seed, List<String> terms) {
         this.seed = seed;
         this.terms = terms;
@@ -38,6 +48,9 @@ public class CrawlerController {
         }
     }
 
+    /**
+     * A method that initiates the process of crawling.
+     */
     public void start() {
         try {
             ExecutorService executor = Executors.newFixedThreadPool(5);
@@ -53,7 +66,7 @@ public class CrawlerController {
                     visitedURLs.add(url.getUrl());
                 } else {
                     Thread.sleep(1000);
-                    if(urlsToVisit.isEmpty())
+                    if (urlsToVisit.isEmpty())
                         break;
                 }
             }

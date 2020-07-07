@@ -12,6 +12,24 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+/**
+ * <h1>Web Crawler</h1>
+ *  This is a console application that searches predefined terms on different websites
+ *  starting from the predefined seed URL and following all found links there.
+ *  The program stops execution when the number of pages exceeds the limit (1000 by default) or when there is no more pages to visit.
+ *  The maximum depth of the search is 8 pages deep from the seed page.
+ *  The program takes seed URL and terms from the input.txt file that has the following format:
+ *  Seed url + line break <br>
+ *  term1 + line break <br>
+ *  term2 + line break <br>
+ *  ... <br>
+ *  The terms can contain spaces.
+ *  <p><b>Note:<b/> The search is case-sensitive</p>
+ *
+ * @author Vladislav Matskevich
+ * @version 1.0
+ * @since 07.07.2020
+ */
 public class Main {
 
     private static Logger LOGGER = Logger.getLogger(Main.class.getName());
