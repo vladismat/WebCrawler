@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.matsoft</groupId>
-    <artifactId>WebCrawler</artifactId>
+    <artifactId>web-crawler</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
@@ -17,6 +17,11 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.1</version>
         </dependency>
     </dependencies>
 

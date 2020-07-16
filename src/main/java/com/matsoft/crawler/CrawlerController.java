@@ -4,6 +4,7 @@ import com.matsoft.crawler.impl.WebCrawlerImpl;
 import com.matsoft.exception.UrlNotValidException;
 import com.matsoft.web.WebURL;
 import com.matsoft.web.impl.SimpleWebURL;
+import com.opencsv.CSVWriter;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class CrawlerController {
     private Set<String> visitedURLs;
     private BlockingQueue<WebURL> urlsToVisit;
 
-    private FileWriter fileWriter = null;
+    private CSVWriter fileWriter = null;
     static private Logger LOGGER = Logger.getLogger(CrawlerController.class.getName());
 
     /**
@@ -42,7 +43,7 @@ public class CrawlerController {
         this.urlsToVisit = new ArrayBlockingQueue<>(1000);
         this.visitedURLs = new HashSet<>();
         try {
-            this.fileWriter = new FileWriter("output.txt");
+            this.fileWriter = new CSVWriter(new FileWriter("output.csv"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "File Writer couldn't create a file", e);
         }
@@ -53,7 +54,13 @@ public class CrawlerController {
      */
     public void start() {
         try {
-            ExecutorService executor = Executors.newFixedThreadPool(5);
+            String[] head = new String[terms.size()+2];
+            head[0] = "URL";
+            System.arraycopy(terms.toArray(), 0 , head, 1, terms.size());
+            head[terms.size()+1] = "Total";
+            fileWriter.writeNext(head);
+
+            ExecutorService executor = Executors.newCachedThreadPool();
             visitedURLs.add(seed);
 
             //Seed processing
@@ -73,8 +80,9 @@ public class CrawlerController {
                     visitedURLs.add(url.getUrl());
                 } else {
                     Thread.sleep(1000);
-                    if (urlsToVisit.isEmpty())
+                    if (urlsToVisit.isEmpty()) {
                         break;
+                    }
                 }
             }
             executor.shutdown();

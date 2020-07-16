@@ -22,6 +22,4 @@ public interface WebCrawler extends Runnable {
 
     Set<String> getVisitedURLs();
 
-    FileWriter getFileWriter();
-
 }

@@ -2,6 +2,7 @@ package com.matsoft;
 
 import com.matsoft.crawler.impl.WebCrawlerImpl;
 import com.matsoft.web.impl.SimpleWebURL;
+import com.opencsv.CSVWriter;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class CreateUtilities {
     public static WebCrawlerImpl createWebCrawler(String url, List<String> terms) {
         try {
         return new WebCrawlerImpl(new SimpleWebURL(url, DEFAULT_DEPTH), terms,
-                new ArrayBlockingQueue<>(1000), new HashSet<>(), new FileWriter("test_output.txt"));
+                new ArrayBlockingQueue<>(1000), new HashSet<>(), new CSVWriter(new FileWriter("test_output.csv")));
         } catch (IOException e) {
             return null;
         }

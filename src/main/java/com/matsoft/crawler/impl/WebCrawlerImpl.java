@@ -4,6 +4,7 @@ import com.matsoft.crawler.WebCrawler;
 import com.matsoft.exception.UrlNotValidException;
 import com.matsoft.web.WebURL;
 import com.matsoft.web.impl.SimpleWebURL;
+import com.opencsv.CSVWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,20 +25,20 @@ public class WebCrawlerImpl implements WebCrawler {
     private List<String> terms;
     private BlockingQueue<WebURL> urlsToVisit;
     private Set<String> visitedURLs;
-    private FileWriter fileWriter;
+    private CSVWriter fileWriter;
     static private Logger LOGGER = Logger.getLogger(WebCrawlerImpl.class.getName());
 
     /**
      * Constructor of the WebCrawler.
      *
-     * @param url URL of the page to process. WebURL interface to know the depth.
-     * @param terms list of terms to search
+     * @param url         URL of the page to process. WebURL interface to know the depth.
+     * @param terms       list of terms to search
      * @param urlsToVisit Blocking Queue of URLs passed by the controller to put found links in
      * @param visitedURLs Set of already visited urls to check found URLs
-     * @param fileWriter File Writer for output to file
+     * @param fileWriter  File Writer for output to file
      */
     public WebCrawlerImpl(WebURL url, final List<String> terms, BlockingQueue<WebURL> urlsToVisit,
-                          final Set<String> visitedURLs, FileWriter fileWriter) {
+                          final Set<String> visitedURLs, CSVWriter fileWriter) {
         this.url = url;
         this.terms = terms;
         this.urlsToVisit = urlsToVisit;
@@ -78,8 +79,7 @@ public class WebCrawlerImpl implements WebCrawler {
         return visitedURLs;
     }
 
-    @Override
-    public FileWriter getFileWriter() {
+    public CSVWriter getFileWriter() {
         return fileWriter;
     }
 
@@ -100,13 +100,17 @@ public class WebCrawlerImpl implements WebCrawler {
                 return;
 
             Map<String, Integer> searchResult = searchForTerms(body, terms);
-            printToFile("On page " + url.getUrl() + ", that had depth of the search  " + url.getDepth() + ", were found: \n");
+            String[] resultToCSV = new String[terms.size() + 2];
+            resultToCSV[0] = url.getUrl();
+            int i = 1;
             int totalHits = 0;
             for (String term : terms) {
-                printToFile(term + " " + searchResult.get(term) + "\n");
+                resultToCSV[i] = searchResult.get(term).toString();
                 totalHits += searchResult.get(term);
+                i++;
             }
-            printToFile("Total hits on page: " + totalHits + "\n \n");
+            resultToCSV[i] = Integer.toString(totalHits);
+            fileWriter.writeNext(resultToCSV);
 
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "url " + url + " is not valid", e);
@@ -144,13 +148,5 @@ public class WebCrawlerImpl implements WebCrawler {
             fromIndex++;
         }
         return count;
-    }
-
-    private void printToFile(String s) {
-        try {
-            fileWriter.write(s);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Couldn't write the result", e);
-        }
     }
 }

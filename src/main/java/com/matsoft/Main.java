@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  *  term2 + line break <br>
  *  ... <br>
  *  The terms can contain spaces.
- *  <p><b>Note:<b/> The search is case-sensitive</p>
+ *  <p><b>Note:</b> The search is case-sensitive</p>
  *
  * @author Vladislav Matskevich
  * @version 1.0
@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 public class Main {
 
     private static Logger LOGGER = Logger.getLogger(Main.class.getName());
-
     public static void main(String[] args) {
         try {
             LogManager.getLogManager().readConfiguration(
