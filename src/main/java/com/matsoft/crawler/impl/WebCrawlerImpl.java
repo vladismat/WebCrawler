@@ -21,12 +21,13 @@ import java.util.logging.Logger;
  * An implementation of WebCrawler.
  */
 public class WebCrawlerImpl implements WebCrawler {
-    private WebURL url;
-    private List<String> terms;
-    private BlockingQueue<WebURL> urlsToVisit;
-    private Set<String> visitedURLs;
-    private CSVWriter fileWriter;
-    static private Logger LOGGER = Logger.getLogger(WebCrawlerImpl.class.getName());
+
+    private final WebURL url;
+    private final List<String> terms;
+    private final BlockingQueue<WebURL> urlsToVisit;
+    private final Set<String> visitedURLs;
+    private final CSVWriter fileWriter;
+    private static final Logger LOGGER = Logger.getLogger(WebCrawlerImpl.class.getName());
 
     /**
      * Constructor of the WebCrawler.
@@ -96,6 +97,7 @@ public class WebCrawlerImpl implements WebCrawler {
                 }
             }
             Element body = document.body();
+
             if (body == null)
                 return;
 
@@ -124,7 +126,7 @@ public class WebCrawlerImpl implements WebCrawler {
         Elements links = document.select("a[href]");
         for (Element link : links) {
             String url = link.attr("abs:href");
-            if (!visitedURLs.contains(url)) {
+            if (!visitedURLs.contains(url) && !url.contains("#")) {
                 foundURLs.add(url);
             }
         }

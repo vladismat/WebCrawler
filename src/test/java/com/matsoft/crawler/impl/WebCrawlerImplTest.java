@@ -2,6 +2,7 @@ package com.matsoft.crawler.impl;
 
 import com.matsoft.CreateUtilities;
 import com.matsoft.LoggerInitializer;
+import com.opencsv.CSVReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,14 +43,11 @@ public class WebCrawlerImplTest {
     public void run() throws Exception {
         webCrawler.run();
         webCrawler.getFileWriter().close();
-        Scanner scanner = new Scanner(new File("test_output.txt"));
-        assertEquals("On page " + TEST_URL + ", that had depth of the search  2, were found: ", scanner.nextLine());
-        assertEquals("Septimius Severus 57", scanner.nextLine());
-        assertEquals("Rome 28", scanner.nextLine());
-        assertEquals("the 426", scanner.nextLine());
-        assertEquals("Ivan 0", scanner.nextLine());
-        assertEquals("Total hits on page: 511", scanner.nextLine());
-        scanner.close();
+        CSVReader reader = new CSVReader(new FileReader(new File("test_output.csv")));
+        String[] result = reader.readNext();
+        String[] expected = {TEST_URL, "57", "28", "426", "0", "511"};
+        assertArrayEquals(expected, result);
+        reader.close();
     }
 
 }

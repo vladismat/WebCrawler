@@ -19,20 +19,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * CrawlerController class initiates the process of crawling, sends crawlers to different websites and manages multithreading.
+ * CrawlerController class initiates the process of crawling, sends crawlers
+ * to different websites and manages multithreading.
  */
 public class CrawlerController {
     private static final int LIMIT = 1000; //Maximum number of pages to crawl. 1000 by default.
-    private String seed;
-    private List<String> terms;
-    private Set<String> visitedURLs;
-    private BlockingQueue<WebURL> urlsToVisit;
+    private final String seed;
+    private final List<String> terms;
+    private final Set<String> visitedURLs;
+    private final BlockingQueue<WebURL> urlsToVisit;
+    private CSVWriter fileWriter;
 
-    private CSVWriter fileWriter = null;
-    static private Logger LOGGER = Logger.getLogger(CrawlerController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CrawlerController.class.getName());
 
     /**
-     * Constructor. Initiates collections and File Writer. It's impossible to start crawling without a seed and a list of terms.
+     * Constructor. Initiates collections and File Writer. It's impossible to s
+     * tart crawling without a seed and a list of terms.
      *
      * @param seed  seed URL to start crawling
      * @param terms a list of terms to search for
@@ -40,7 +42,7 @@ public class CrawlerController {
     public CrawlerController(String seed, List<String> terms) {
         this.seed = seed;
         this.terms = terms;
-        this.urlsToVisit = new ArrayBlockingQueue<>(1000);
+        this.urlsToVisit = new ArrayBlockingQueue<>(LIMIT);
         this.visitedURLs = new HashSet<>();
         try {
             this.fileWriter = new CSVWriter(new FileWriter("output.csv"));
@@ -54,10 +56,10 @@ public class CrawlerController {
      */
     public void start() {
         try {
-            String[] head = new String[terms.size()+2];
+            String[] head = new String[terms.size() + 2];
             head[0] = "URL";
-            System.arraycopy(terms.toArray(), 0 , head, 1, terms.size());
-            head[terms.size()+1] = "Total";
+            System.arraycopy(terms.toArray(), 0, head, 1, terms.size());
+            head[terms.size() + 1] = "Total";
             fileWriter.writeNext(head);
 
             ExecutorService executor = Executors.newCachedThreadPool();
@@ -66,7 +68,8 @@ public class CrawlerController {
             //Seed processing
             try {
                 WebURL seedURL = new SimpleWebURL(seed, 0);
-                Thread seedCrawler = new Thread(new WebCrawlerImpl(seedURL, terms, urlsToVisit, visitedURLs, fileWriter));
+                Thread seedCrawler = new Thread(
+                        new WebCrawlerImpl(seedURL, terms, urlsToVisit, visitedURLs, fileWriter));
                 seedCrawler.start();
                 seedCrawler.join();
             } catch (UrlNotValidException e) {
@@ -87,7 +90,7 @@ public class CrawlerController {
             }
             executor.shutdown();
             try {
-                for (; ; ) {
+                for (;;) {
                     if (executor.isTerminated()) {
                         fileWriter.close();
                         break;

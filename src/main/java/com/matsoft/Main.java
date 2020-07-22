@@ -32,7 +32,8 @@ import java.util.logging.Logger;
  */
 public class Main {
 
-    private static Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
         try {
             LogManager.getLogManager().readConfiguration(
@@ -42,13 +43,11 @@ public class Main {
         }
         String seed = "";
         List<String> terms = new ArrayList<>();
-        try {
-            Scanner scanner = new Scanner(new File("input.txt"));
+        try (Scanner scanner = new Scanner(new File("input.txt"))) {
             seed = scanner.nextLine();
             while (scanner.hasNext()) {
                 terms.add(scanner.nextLine());
             }
-            scanner.close();
         } catch (FileNotFoundException e) {
             LOGGER.log(Level.SEVERE, "Input file wasn't found", e);
         }
